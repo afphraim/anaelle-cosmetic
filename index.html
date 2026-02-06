@@ -1,300 +1,525 @@
 import React, { useState, useEffect } from 'react';
-import { Phone, Check, Star, Shield, MapPin, Menu, X, Instagram, Calendar, ArrowLeft, Zap, ThermometerSnowflake, Heart } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  CheckCircle2, 
+  XCircle, 
+  Zap, 
+  ShieldCheck, 
+  Smile, 
+  MessageCircle, 
+  MapPin, 
+  Phone, 
+  Clock, 
+  Star, 
+  ChevronDown, 
+  ArrowRight,
+  Sparkles,
+  Gift,
+  Calendar,
+  Waves
+} from 'lucide-react';
+
+// --- Components ---
+
+const Navbar = () => (
+  <nav className="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-pink-100">
+    <div className="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between flex-row-reverse">
+      <div className="text-2xl font-bold text-pink-600 tracking-tighter">
+        ANAELLE <span className="text-pink-400 font-light">COSMETIC</span>
+      </div>
+      <div className="hidden md:flex items-center gap-8 flex-row-reverse">
+        <a href="#pathway" className="text-gray-600 hover:text-pink-500 transition-colors">הדרך שלך לעור חלק</a>
+        <a href="#testimonials" className="text-gray-600 hover:text-pink-500 transition-colors">המלצות</a>
+        <a href="#contact" className="bg-pink-500 text-white px-6 py-2 rounded-full hover:bg-pink-600 transition-all shadow-md">טיפול חינם</a>
+      </div>
+    </div>
+  </nav>
+);
+
+const TrustBadge = ({ icon: Icon, text }) => (
+  <div className="flex items-center gap-2 bg-white/50 backdrop-blur-sm px-4 py-2 rounded-full border border-pink-100 shadow-sm">
+    <Icon className="w-5 h-5 text-pink-500" />
+    <span className="text-sm font-medium text-gray-700">{text}</span>
+  </div>
+);
 
 const App = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [formStatus, setFormStatus] = useState('idle');
   const [formData, setFormData] = useState({
-    name: '',
+    fullName: '',
     phone: '',
+    area: 'ירושלים',
     gender: 'נקבה'
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
-  const brandColor = '#FBB7DA';
-  const instagramUrl = "https://www.instagram.com/anaelle_cosmetic?igsh=MXdmcTN3YWc1Ymp0Zg==";
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setFormStatus('submitting');
-    setTimeout(() => {
-      setFormStatus('success');
-    }, 1500);
-  };
-
-  const scrollToContact = () => {
-    document.getElementById('contact-form').scrollIntoView({ behavior: 'smooth' });
+    setIsSubmitting(true);
+    try {
+      await fetch('https://sheetdb.io/api/v1/01hzxodg741zg', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          data: [{
+            ...formData,
+            date: new Date().toLocaleString('he-IL')
+          }]
+        })
+      });
+      setIsSuccess(true);
+      setFormData({ fullName: '', phone: '', area: 'ירושלים', gender: 'נקבה' });
+      setTimeout(() => setIsSuccess(false), 5000);
+    } catch (error) {
+      console.error("Error submitting form", error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
-    <div dir="rtl" className="font-sans text-gray-800 bg-white min-h-screen">
-      {/* Navigation */}
-      <header className="fixed w-full bg-white/95 backdrop-blur-sm shadow-sm z-50 border-b border-pink-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-20">
-            <div className="flex-shrink-0 flex items-center">
-              <span className="text-2xl font-serif font-bold tracking-tight" style={{ color: '#d484ab' }}>
-                Anaelle <span style={{ color: brandColor }}>Cosmetic</span>
-              </span>
-            </div>
-            
-            <div className="hidden md:flex items-center space-x-8 space-x-reverse">
-              <a href="#about" className="text-gray-600 hover:text-pink-400 transition">הטכנולוגיה</a>
-              <a href="#offer" className="text-gray-600 hover:text-pink-400 transition">המבצע שלנו</a>
-              <a href="#reviews" className="text-gray-600 hover:text-pink-400 transition">לקוחות ממליצות</a>
-              <button 
-                onClick={scrollToContact}
-                className="text-white px-6 py-2 rounded-full font-bold transition shadow-md hover:opacity-90 flex items-center gap-2"
-                style={{ backgroundColor: brandColor }}
-              >
-                תיאום טיפול ניסיון
-              </button>
-            </div>
-
-            <div className="md:hidden">
-              <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-gray-600">
-                {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen bg-[#FFF5F9] font-sans selection:bg-pink-200" dir="rtl">
+      <Navbar />
 
       {/* Hero Section */}
-      <section className="relative pt-32 pb-16 lg:pt-48 lg:pb-32 overflow-hidden bg-[#fff5f9]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="lg:grid lg:grid-cols-2 lg:gap-16 items-center">
-            <div className="text-right mb-12 lg:mb-0">
-              <div className="inline-flex items-center gap-2 bg-white px-4 py-1 rounded-full text-pink-500 text-sm font-bold mb-6 shadow-sm border border-pink-100">
-                <ThermometerSnowflake size={16} />
-                לייזר קר - הטכנולוגיה החזקה בעולם
-              </div>
-              <h1 className="text-4xl lg:text-6xl font-extrabold text-gray-900 leading-tight mb-6">
-                להיות חלקה <span style={{ color: brandColor }}>בלי כאב</span><br/>
-                בירושלים
-              </h1>
-              <p className="text-xl text-gray-600 mb-8 max-w-xl leading-relaxed">
-                ב-Anaelle Cosmetic אנחנו מבטיחים לך תוצאה כבר מהטיפול הראשון. לייזר עוצמתי עם ידית קרה לחוויה נעימה וחלקה באמת.
-              </p>
-              
-              <div className="bg-white p-4 rounded-xl border-r-4 border-pink-300 shadow-sm mb-8 inline-block">
-                <p className="font-bold text-gray-800">🎁 הצעה מיוחדת לזמן מוגבל:</p>
-                <p className="text-pink-600 font-extrabold text-lg">טיפול ניסיון חינם לגמרי + 2 טיפולים מתנה ברכישת סדרה!</p>
-              </div>
+      <section className="relative pt-32 pb-20 overflow-hidden">
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-pink-200/30 rounded-full blur-3xl -z-10 translate-x-1/2 -translate-y-1/2" />
+        <div className="max-w-7xl mx-auto px-4 text-center">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <h1 className="text-5xl md:text-7xl font-extrabold text-gray-900 mb-6 leading-tight">
+              לייזר ללא כאב <br />
+              <span className="text-pink-600">עם ידית קרה</span>
+            </h1>
+            <p className="text-xl md:text-2xl text-gray-600 mb-10 max-w-2xl mx-auto">
+              טיפול ניסיון חינם + 2 טיפולים מתנה ברכישת סדרה.
+              <br />הגיע הזמן לעור חלק בלי להתפשר על הנוחות.
+            </p>
 
-              <div className="flex flex-col sm:flex-row gap-4">
-                <button 
-                  onClick={scrollToContact}
-                  className="text-white px-10 py-4 rounded-full text-xl font-bold transition shadow-xl hover:shadow-2xl transform hover:-translate-y-1"
-                  style={{ backgroundColor: brandColor }}
-                >
-                  אני רוצה טיפול ניסיון חינם
-                </button>
-              </div>
+            <div className="flex flex-col md:flex-row items-center justify-center gap-4 mb-12">
+              <a href="#contact" className="w-full md:w-auto bg-pink-500 text-white text-lg font-bold px-10 py-4 rounded-full shadow-lg hover:bg-pink-600 hover:scale-105 transition-all">
+                קבלי טיפול חינם
+              </a>
+              <a href="https://wa.me/972585946403" className="w-full md:w-auto bg-white border-2 border-pink-200 text-pink-600 text-lg font-bold px-10 py-4 rounded-full shadow-md hover:bg-pink-50 transition-all flex items-center justify-center gap-2">
+                <MessageCircle className="w-5 h-5" />
+                שלחי ווטסאפ
+              </a>
             </div>
 
-            {/* Form Section */}
-            <div id="contact-form" className="bg-white p-8 rounded-3xl shadow-2xl border border-pink-50 relative">
-              <div className="absolute -top-4 -right-4 bg-pink-500 text-white p-4 rounded-2xl shadow-lg rotate-12 hidden md:block">
-                <span className="font-bold">0% סקפטיות!</span>
-              </div>
-              
-              {formStatus === 'success' ? (
-                <div className="text-center py-16">
-                  <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <Check className="text-green-600" size={40} />
-                  </div>
-                  <h3 className="text-3xl font-bold text-gray-900 mb-2">איזה כיף!</h3>
-                  <p className="text-gray-600">ניצור איתך קשר בהקדם לתיאום הטיפול החינמי שלך.</p>
-                </div>
-              ) : (
-                <>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">תאמי פגישה בירושלים 🌸</h3>
-                  <p className="text-gray-500 mb-6 font-medium">השאירי פרטים ונחזור אלייך לשיחת ייעוץ</p>
-                  <form onSubmit={handleSubmit} className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1 italic">שם מלא</label>
-                      <input required type="text" className="w-full px-4 py-3 rounded-xl border border-pink-100 focus:ring-2 focus:ring-pink-300 focus:border-transparent outline-none bg-pink-50/30 transition text-lg" placeholder="שם שלך" />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1 italic">טלפון</label>
-                      <input required type="tel" className="w-full px-4 py-3 rounded-xl border border-pink-100 focus:ring-2 focus:ring-pink-300 focus:border-transparent outline-none bg-pink-50/30 transition text-lg" placeholder="מספר נייד" />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1 italic">מין</label>
-                      <select className="w-full px-4 py-3 rounded-xl border border-pink-100 focus:ring-2 focus:ring-pink-300 focus:border-transparent outline-none bg-pink-50/30 transition text-lg">
-                        <option>נקבה</option>
-                        <option>זכר</option>
-                      </select>
-                    </div>
-                    <button 
-                      disabled={formStatus === 'submitting'}
-                      type="submit" 
-                      className="w-full text-white font-bold py-5 rounded-2xl hover:opacity-90 transition shadow-lg flex justify-center items-center gap-3 text-xl"
-                      style={{ backgroundColor: brandColor }}
-                    >
-                      {formStatus === 'submitting' ? 'שולח...' : 'שרייני לי טיפול ניסיון חינם'}
-                      <ArrowLeft size={24} />
-                    </button>
-                    <div className="flex items-center justify-center gap-2 text-xs text-gray-400 mt-2">
-                      <Shield size={12} />
-                      המידע שלך מאובטח ופרטי
-                    </div>
-                  </form>
-                </>
-              )}
+            <div className="flex flex-wrap justify-center gap-4 mb-16">
+              <TrustBadge icon={ShieldCheck} text="באישור FDA ומשרד הבריאות" />
+              <TrustBadge icon={Zap} text="המכשיר החזק ביותר בשוק" />
+              <TrustBadge icon={Smile} text="98% שביעות רצון לקוחות" />
             </div>
-          </div>
+
+            <motion.div 
+              animate={{ y: [0, 10, 0] }}
+              transition={{ repeat: Infinity, duration: 2 }}
+              className="flex justify-center"
+            >
+              <ChevronDown className="text-pink-300 w-8 h-8" />
+            </motion.div>
+          </motion.div>
         </div>
       </section>
 
-      {/* Main Benefits */}
-      <section id="about" className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold mb-16 underline decoration-pink-200 underline-offset-8">למה Anaelle Cosmetic?</h2>
-          <div className="grid md:grid-cols-4 gap-8">
-            <div className="p-6">
-              <div className="w-16 h-16 bg-pink-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                <ThermometerSnowflake className="text-pink-400" size={32} />
-              </div>
-              <h4 className="font-bold text-lg mb-2">לייזר קר - 0 כאב</h4>
-              <p className="text-gray-500 text-sm">ידית הקירור המיוחדת שלנו דואגת שלא תרגישי דבר מלבד רעננות.</p>
-            </div>
-            <div className="p-6">
-              <div className="w-16 h-16 bg-pink-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Zap className="text-pink-400" size={32} />
-              </div>
-              <h4 className="font-bold text-lg mb-2">הכי חזק בשוק</h4>
-              <p className="text-gray-500 text-sm">טכנולוגיה עוצמתית שחודרת לעומק השורש לתוצאה מהירה.</p>
-            </div>
-            <div className="p-6">
-              <div className="w-16 h-16 bg-pink-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Check className="text-pink-400" size={32} />
-              </div>
-              <h4 className="font-bold text-lg mb-2">תוצאות מהטיפול הראשון</h4>
-              <p className="text-gray-500 text-sm">אנחנו לא רק מבטיחים - את תראי את ההבדל כבר אחרי הטיפול הראשון.</p>
-            </div>
-            <div className="p-6">
-              <div className="w-16 h-16 bg-pink-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Heart className="text-pink-400" size={32} />
-              </div>
-              <h4 className="font-bold text-lg mb-2">נוחות מקסימלית</h4>
-              <p className="text-gray-500 text-sm">קליניקה נעימה, שירות אישי ומיקום מרכזי בירושלים.</p>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Problem/Solution Section */}
+      <section className="py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="grid md:grid-cols-2 gap-12 items-center mb-20">
+            {/* Problems */}
+            <motion.div 
+              initial={{ opacity: 0, x: 50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="bg-red-50 p-8 rounded-3xl border border-red-100"
+            >
+              <h3 className="text-2xl font-bold text-red-700 mb-6">נמאס לך מ...?</h3>
+              <ul className="space-y-4">
+                {[
+                  "גילוח יומיומי מעייף ומגרד",
+                  "שעווה כואבת שמשאירה סימנים",
+                  "טיפולי לייזר שגורמים לך לסבול",
+                  "תוצאות איטיות שלא נראות לעין"
+                ].map((item, idx) => (
+                  <li key={idx} className="flex items-center gap-3 text-red-600">
+                    <XCircle className="w-6 h-6 shrink-0" />
+                    <span className="text-lg">{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
 
-      {/* Single Unified Offer Box */}
-      <section id="offer" className="py-12 px-4">
-        <div className="max-w-4xl mx-auto bg-gradient-to-l from-pink-100 to-pink-50 rounded-[2rem] p-10 text-center border-2 border-dashed border-pink-300 relative overflow-hidden">
-            <div className="absolute top-0 right-0 p-8 opacity-10">
-                <Zap size={100} />
-            </div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">די לסקפטיות! בואי לנסות בחינם 💖</h2>
-            <div className="max-w-2xl mx-auto bg-white p-8 rounded-2xl shadow-sm border border-pink-100 relative">
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-pink-500 text-white text-xs px-4 py-1 rounded-full uppercase tracking-wider font-bold shadow-sm">הטבה בלעדית</div>
-                <h3 className="text-3xl font-extrabold mb-4 text-pink-600">טיפול ניסיון חינם לגמרי</h3>
-                <p className="text-gray-700 text-lg mb-4">אנחנו כל כך בטוחים בתוצאות ובחוסר הכאב, שאנחנו מזמינים אותך לבדוק אותנו ללא שום עלות.</p>
-                <div className="w-full h-px bg-pink-100 my-4"></div>
-                <p className="text-gray-600 font-medium">בונוס נוסף: 2 טיפולים מתנה ברכישת סדרה של 10!</p>
-                <button 
-                  onClick={scrollToContact}
-                  className="mt-6 text-white px-8 py-3 rounded-full font-bold transition hover:opacity-90 shadow-md"
-                  style={{ backgroundColor: brandColor }}
-                >
-                  שרייני לי מקום עכשיו
-                </button>
-            </div>
-        </div>
-      </section>
-
-      {/* Reviews Section */}
-      <section id="reviews" className="py-20 bg-[#fffdfd]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4 italic">הן כבר לא מתפשרות על פחות</h2>
-            <p className="text-gray-500">מאות נשים בירושלים כבר נהנות מעור חלק</p>
+            {/* Solutions */}
+            <motion.div 
+              initial={{ opacity: 0, x: -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              className="bg-pink-50 p-8 rounded-3xl border border-pink-100"
+            >
+              <h3 className="text-2xl font-bold text-pink-700 mb-6">הפתרון של Anaelle:</h3>
+              <ul className="space-y-4">
+                {[
+                  "ידית קרה בטמפרטורה של -4 מעלות לאפס כאב",
+                  "טכנולוגיית הלייזר החזקה בעולם",
+                  "תוצאות נראות לעין כבר מהטיפול הראשון",
+                  "חוויית קליניקה מפנקת ואישית"
+                ].map((item, idx) => (
+                  <li key={idx} className="flex items-center gap-3 text-pink-600">
+                    <CheckCircle2 className="w-6 h-6 shrink-0" />
+                    <span className="text-lg font-medium">{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
           </div>
+
+          {/* Technology Cards */}
           <div className="grid md:grid-cols-3 gap-8">
             {[
-              { text: "הייתי בטוחה שיכאב לי כמו במכונים הקודמים, אבל הידית הקרה פשוט עושה קסמים. לא הרגשתי כלום!", author: "אדווה כ.", status: "לקוחה מרוצה" },
-              { text: "הלייזר הכי חזק שהייתי בו, רואים תוצאות אחרי שבועיים מהטיפול הראשון. ממליצה על סדרת ה-10!", author: "שירה מ.", status: "ירושלים" },
-              { text: "שירות מדהים ב-Anaelle Cosmetic. המקום נקי, המטפלות מקצועיות והכי חשוב - המחיר פייר לגמרי.", author: "רחל א.", status: "טיפול גוף מלא" }
-            ].map((rev, i) => (
-              <div key={i} className="bg-white p-8 rounded-2xl shadow-md hover:shadow-lg transition-shadow border-b-4 border-pink-200">
-                <div className="flex text-yellow-400 mb-4">
-                  {[1,2,3,4,5].map(s => <Star key={s} size={14} fill="currentColor" />)}
-                </div>
-                <p className="text-gray-700 leading-relaxed italic mb-6">"{rev.text}"</p>
-                <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-pink-100 flex items-center justify-center font-bold text-pink-500">
-                        {rev.author[0]}
-                    </div>
-                    <div>
-                        <div className="font-bold text-gray-900">{rev.author}</div>
-                        <div className="text-xs text-gray-500">{rev.status}</div>
-                    </div>
-                </div>
-              </div>
+              { title: "ידית קרה", desc: "קירור רציף שמנטרל את תחושת החום והכאב לחלוטין.", icon: "❄️" },
+              { title: "הכי חזק בשוק", desc: "עוצמה מקסימלית למינימום טיפולים ותוצאות מהירות.", icon: "⚡" },
+              { title: "בטוח לכולן", desc: "מתאים לכל גווני העור ולכל סוגי השיער.", icon: "🛡️" }
+            ].map((card, idx) => (
+              <motion.div 
+                key={idx}
+                whileHover={{ y: -10 }}
+                className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 text-center"
+              >
+                <div className="text-4xl mb-4">{card.icon}</div>
+                <h4 className="text-xl font-bold text-gray-800 mb-2">{card.title}</h4>
+                <p className="text-gray-600">{card.desc}</p>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-gray-50 pt-16 pb-8 border-t border-pink-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-3 gap-12 mb-12">
-            <div>
-              <span className="text-2xl font-serif font-bold" style={{ color: '#d484ab' }}>
-                Anaelle <span style={{ color: brandColor }}>Cosmetic</span>
-              </span>
-              <p className="mt-4 text-gray-500 max-w-xs leading-relaxed">
-                מומחית להסרת שיער בלייזר בירושלים. שילוב של טכנולוגיה, תוצאות ונוחות מקסימלית.
-              </p>
+      {/* Updated Pathway Section */}
+      <section id="pathway" className="py-24 bg-[#FFF5F9] overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="text-center mb-20">
+            <h2 className="text-4xl font-extrabold text-gray-900 mb-4">הדרך שלך לעור חלק</h2>
+            <p className="text-gray-600 max-w-xl mx-auto italic">ליווי מקצועי ואישי מהרגע הראשון ועד לתוצאה המושלמת.</p>
+          </div>
+
+          <div className="relative">
+            {/* Connecting Line (Desktop) */}
+            <div className="hidden lg:block absolute top-1/2 left-0 w-full h-1 bg-pink-200 -translate-y-1/2 -z-10" />
+
+            <div className="grid lg:grid-cols-3 gap-12">
+              {/* Step 1 */}
+              <motion.div 
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="bg-white p-10 rounded-[2.5rem] shadow-xl border border-pink-50 relative group"
+              >
+                <div className="absolute -top-6 right-10 w-12 h-12 bg-pink-500 text-white rounded-full flex items-center justify-center font-bold text-xl shadow-lg group-hover:scale-110 transition-transform">1</div>
+                <div className="mb-6 flex justify-between items-start">
+                    <Gift className="w-10 h-10 text-pink-400" />
+                    <span className="bg-pink-50 text-pink-600 text-xs font-bold px-3 py-1 rounded-full">ללא התחייבות</span>
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">התנסות ראשונה</h3>
+                <p className="text-gray-600 leading-relaxed mb-6">מגיעה לבדיקת התאמה וטיפול ניסיון חינם על אזור קטן. המטרה: שתרגישי את הידית הקרה ותראי שזה באמת לא כואב.</p>
+                <div className="text-pink-600 font-bold flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4" />
+                    חינם לגמרי
+                </div>
+              </motion.div>
+
+              {/* Step 2 */}
+              <motion.div 
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.2 }}
+                className="bg-pink-600 p-10 rounded-[2.5rem] shadow-2xl text-white relative scale-105 group"
+              >
+                <div className="absolute -top-6 right-10 w-12 h-12 bg-white text-pink-600 rounded-full flex items-center justify-center font-bold text-xl shadow-lg group-hover:scale-110 transition-transform">2</div>
+                <div className="mb-6 flex justify-between items-start">
+                    <Calendar className="w-10 h-10 text-pink-200" />
+                    <span className="bg-pink-500 text-white text-xs font-bold px-3 py-1 rounded-full border border-pink-400">הטיפולים</span>
+                </div>
+                <h3 className="text-2xl font-bold mb-3">סדרת הטיפולים</h3>
+                <p className="text-pink-50 leading-relaxed mb-6">בניית תוכנית עבודה אישית לתוצאה מקסימלית. הטבה בלעדית: ברכישת סדרה של 10 טיפולים, את מקבלת 2 נוספים במתנה.</p>
+                <div className="bg-white/20 p-4 rounded-2xl backdrop-blur-sm border border-white/30">
+                    <div className="text-sm">הטבה לסדרה:</div>
+                    <div className="text-2xl font-black">10 + 2 מתנה</div>
+                </div>
+              </motion.div>
+
+              {/* Step 3 */}
+              <motion.div 
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.4 }}
+                className="bg-white p-10 rounded-[2.5rem] shadow-xl border border-pink-50 relative group"
+              >
+                <div className="absolute -top-6 right-10 w-12 h-12 bg-pink-500 text-white rounded-full flex items-center justify-center font-bold text-xl shadow-lg group-hover:scale-110 transition-transform">3</div>
+                <div className="mb-6 flex justify-between items-start">
+                    <Waves className="w-10 h-10 text-pink-400" />
+                    <span className="bg-pink-50 text-pink-600 text-xs font-bold px-3 py-1 rounded-full">תוצאות קבועות</span>
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">תחזוקה ושימור</h3>
+                <p className="text-gray-600 leading-relaxed mb-6">לאחר סיום הסדרה, אנו מציעים חבילות שימור במחירים נוחים במיוחד, כדי להבטיח שהעור שלך יישאר חלק ומושלם לאורך שנים.</p>
+                <div className="text-pink-600 font-bold flex items-center gap-2">
+                    <Sparkles className="w-4 h-4" />
+                    מקצועיות ללא פשרות
+                </div>
+              </motion.div>
             </div>
-            <div>
-              <h4 className="font-bold text-gray-900 mb-4 underline decoration-pink-200">איפה אנחנו?</h4>
-              <ul className="space-y-3 text-gray-600">
-                <li className="flex items-center gap-2"><MapPin size={18} className="text-pink-400" /> ירושלים</li>
-                <li className="flex items-center gap-2"><Phone size={18} className="text-pink-400" /> 058-594-6403</li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-bold text-gray-900 mb-4 underline decoration-pink-200">עקבי אחרינו</h4>
-              <div className="flex gap-4">
-                <a 
-                  href={instagramUrl} 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  className="p-3 bg-white rounded-xl shadow-sm hover:text-pink-400 transition border border-pink-50"
-                  aria-label="Instagram"
-                >
-                  <Instagram size={24} />
-                </a>
+          </div>
+          
+          <div className="mt-16 text-center">
+             <a href="#contact" className="inline-flex items-center gap-3 bg-pink-500 text-white font-bold px-12 py-5 rounded-full shadow-xl hover:bg-pink-600 hover:scale-105 transition-all text-xl">
+               תיאום טיפול ניסיון (חינם)
+               <ArrowRight className="w-6 h-6" />
+             </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section id="testimonials" className="py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-extrabold text-gray-900 mb-4">לקוחות מספרות</h2>
+            <div className="flex justify-center gap-8 mt-6">
+              <div className="text-center">
+                <div className="text-3xl font-bold text-pink-600">98%</div>
+                <div className="text-sm text-gray-500">שביעות רצון</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-pink-600">0</div>
+                <div className="text-sm text-gray-500">כאב</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-pink-600">1,000+</div>
+                <div className="text-sm text-gray-500">לקוחות מרוצות</div>
               </div>
             </div>
           </div>
-          <div className="pt-8 border-t border-pink-50 text-center text-xs text-gray-400 font-light">
-            © {new Date().getFullYear()} Anaelle Cosmetic Jerusalem. כל הזכויות שמורות.
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              { name: "מיכל כ.", loc: "ירושלים", text: "פשוט חלום! תמיד פחדתי מהכאב ובסוף כמעט נרדמתי בטיפול. התוצאות מדהימות.", tag: "הכי מרוצה" },
+              { name: "שירה א.", loc: "ירושלים", text: "המקום הכי מקצועי שהייתי בו. יחס אישי והמכשיר באמת חזק ברמות אחרות.", tag: "מקצועיות" },
+              { name: "נועה ד.", loc: "ירושלים", text: "אחרי 3 טיפולים כבר אין לי כמעט שיער. הידית הקרה הזו זה פשוט קסם.", tag: "תוצאות מהירות" },
+              { name: "דנה מ.", loc: "ירושלים", text: "שווה כל שקל. הקליניקה נקייה, נעימה ומרגישים שאת בידיים טובות.", tag: "מומלץ בחום" }
+            ].map((t, idx) => (
+              <motion.div 
+                key={idx}
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: idx * 0.1 }}
+                className="bg-[#FFF5F9] p-6 rounded-2xl relative"
+              >
+                <div className="flex gap-1 text-yellow-400 mb-3">
+                  {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 fill-current" />)}
+                </div>
+                <p className="text-gray-700 italic mb-4">"{t.text}"</p>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-pink-200 flex items-center justify-center font-bold text-pink-600">
+                    {t.name[0]}
+                  </div>
+                  <div>
+                    <div className="font-bold text-gray-900">{t.name}</div>
+                    <div className="text-xs text-gray-500">{t.loc}</div>
+                  </div>
+                </div>
+                <div className="absolute -top-2 -right-2 bg-pink-500 text-white text-[10px] px-2 py-1 rounded-full font-bold">
+                  {t.tag}
+                </div>
+              </motion.div>
+            ))}
           </div>
+        </div>
+      </section>
+
+      {/* Contact Form Section */}
+      <section id="contact" className="py-24 bg-[#FFF5F9]">
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="bg-white rounded-[3rem] shadow-2xl overflow-hidden grid md:grid-cols-2">
+            {/* Info Side */}
+            <div className="bg-pink-600 p-12 text-white flex flex-col justify-between">
+              <div>
+                <h2 className="text-3xl font-bold mb-6">בואי נתחיל</h2>
+                <p className="text-pink-100 mb-10">השאירי פרטים ונחזור אלייך תוך פחות מ-24 שעות לתיאום טיפול ניסיון חינם.</p>
+                
+                <div className="space-y-6">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center">
+                      <MapPin className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <div className="font-bold">מיקום</div>
+                      <div className="text-pink-100">ירושלים (חניה בשפע)</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center">
+                      <Phone className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <div className="font-bold">ווטסאפ</div>
+                      <div className="text-pink-100">058-594-6403</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center">
+                      <Clock className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <div className="font-bold">זמן תגובה</div>
+                      <div className="text-pink-100">עד 24 שעות</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Form Side */}
+            <div className="p-12 relative">
+              <AnimatePresence>
+                {isSuccess ? (
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="absolute inset-0 flex flex-col items-center justify-center bg-white z-10 p-8 text-center"
+                  >
+                    <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-4">
+                      <CheckCircle2 className="w-10 h-10" />
+                    </div>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-2">תודה רבה!</h3>
+                    <p className="text-gray-600">הפרטים התקבלו בהצלחה. ניצור קשר בהקדם.</p>
+                  </motion.div>
+                ) : null}
+              </AnimatePresence>
+
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-1">שם מלא</label>
+                  <input 
+                    required
+                    type="text" 
+                    value={formData.fullName}
+                    onChange={(e) => setFormData({...formData, fullName: e.target.value})}
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-pink-500 focus:border-transparent outline-none transition-all"
+                    placeholder="הכניסי את שמך"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-1">מספר טלפון</label>
+                  <input 
+                    required
+                    type="tel" 
+                    value={formData.phone}
+                    onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-pink-500 focus:border-transparent outline-none transition-all"
+                    placeholder="05X-XXXXXXX"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-1">אזור מגורים</label>
+                    <select 
+                      value={formData.area}
+                      onChange={(e) => setFormData({...formData, area: e.target.value})}
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-pink-500 outline-none"
+                    >
+                      <option>ירושלים</option>
+                      <option>בית שמש</option>
+                      <option>מודיעין</option>
+                      <option>אחר</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-1">מין</label>
+                    <select 
+                      value={formData.gender}
+                      onChange={(e) => setFormData({...formData, gender: e.target.value})}
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-pink-500 outline-none"
+                    >
+                      <option>נקבה</option>
+                      <option>זכר</option>
+                    </select>
+                  </div>
+                </div>
+                <button 
+                  disabled={isSubmitting}
+                  type="submit" 
+                  className={`w-full py-4 rounded-xl font-bold text-white shadow-lg transition-all flex items-center justify-center gap-2 ${isSubmitting ? 'bg-gray-400' : 'bg-pink-500 hover:bg-pink-600 hover:scale-[1.02]'}`}
+                >
+                  {isSubmitting ? 'שולח...' : (
+                    <>
+                      <span>תיאום טיפול ניסיון חינם</span>
+                      <ArrowRight className="w-5 h-5" />
+                    </>
+                  )}
+                </button>
+                <p className="text-[10px] text-gray-400 text-center">בלחיצה את מאשרת קבלת תוכן שיווקי וקביעת תור.</p>
+              </form>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-white py-16 border-t border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 grid md:grid-cols-4 gap-12 flex-row-reverse">
+          <div>
+            <div className="text-xl font-bold text-pink-600 mb-4">ANAELLE COSMETIC</div>
+            <p className="text-gray-500 text-sm">קליניקה מקצועית לאסתטיקה ולייזר בטכנולוגיה המתקדמת בעולם.</p>
+          </div>
+          <div>
+            <h4 className="font-bold text-gray-900 mb-4">קישורים</h4>
+            <ul className="space-y-2 text-gray-500 text-sm">
+              <li><a href="#pathway" className="hover:text-pink-500">הדרך שלנו</a></li>
+              <li><a href="#" className="hover:text-pink-500">שאלות נפוצות</a></li>
+              <li><a href="#" className="hover:text-pink-500">מחירון</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="font-bold text-gray-900 mb-4">יצירת קשר</h4>
+            <ul className="space-y-2 text-gray-500 text-sm">
+              <li>ירושלים</li>
+              <li>058-594-6403</li>
+              <li>א-ה: 09:00-20:00</li>
+              <li>ו: 08:30-13:00</li>
+            </ul>
+          </div>
+          <div className="flex flex-col items-start gap-4">
+             <a href="https://wa.me/972585946403" className="bg-green-500 text-white px-6 py-3 rounded-full flex items-center gap-2 font-bold hover:bg-green-600 transition-all">
+               <MessageCircle className="w-5 h-5" />
+               שלחי הודעה
+             </a>
+          </div>
+        </div>
+        <div className="text-center mt-16 text-gray-400 text-xs">
+          © {new Date().getFullYear()} Anaelle Cosmetic. כל הזכויות שמורות.
         </div>
       </footer>
 
-      {/* Floating WhatsApp */}
-      <a 
-        href="https://wa.me/972585946403?text=היי%20אשמח%20לפרטים%20על%20טיפול%20ניסיון%20חינם"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="fixed bottom-6 left-6 z-50 bg-[#25D366] text-white p-4 rounded-full shadow-2xl hover:scale-110 transition-transform flex items-center justify-center group"
-      >
-        <div className="absolute right-full mr-3 bg-white text-gray-800 px-3 py-1 rounded-lg text-sm font-bold opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap shadow-md pointer-events-none">
-          שלחי לי הודעה
+      {/* Floating WhatsApp Button */}
+      <div className="fixed bottom-6 left-6 z-50 group">
+        <div className="absolute bottom-full left-0 mb-4 bg-white px-4 py-2 rounded-xl shadow-xl border border-gray-100 opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap text-sm font-bold text-gray-700">
+          צריכה עזרה? שלחי הודעה
         </div>
-        <svg viewBox="0 0 24 24" className="w-8 h-8 fill-current">
-          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.008-.57-.008-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-        </svg>
-      </a>
+        <a 
+          href="https://wa.me/972585946403" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="w-16 h-16 bg-[#25D366] text-white rounded-full flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 transition-all"
+        >
+          <MessageCircle className="w-8 h-8 fill-current" />
+        </a>
+      </div>
     </div>
   );
 };
