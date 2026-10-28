@@ -19,5 +19,7 @@ survives between cloud sessions:
 Whenever a skill mentions `~/.claude/instagram/<file>`, use
 `.claude/instagram/<file>` in this repo, and commit changes to those files.
 
-All Instagram output is in Hebrew, addressed to women in the feminine form,
-unless asked otherwise.
+The Instagram account being worked on is **@efi_surgery** (EFI SURGERY:
+facelift and thread lift trips to Shanghai and Seoul for Israelis), not
+Anaelle Cosmetic. All Instagram output is in Hebrew, addressed in the plural
+form, unless asked otherwise.
